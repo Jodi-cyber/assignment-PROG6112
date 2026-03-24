@@ -1,0 +1,125 @@
+public class Series {
+private int id;
+private String title;
+private int ageRestriction;
+
+public Series(int id, String title, int ageRestriction) {
+this.id = id;
+this.title = title;
+this.ageRestriction = ageRestriction;
+}
+
+public int getId() { return id; }
+public String getTitle() { return title; }
+public int getAgeRestriction() { return ageRestriction; }
+
+public void setTitle(String title) { this.title = title; }
+public void setAgeRestriction(int ageRestriction) { this.ageRestriction = ageRestriction; }
+}
+
+import java.util.ArrayList;
+
+public class SeriesManager {
+
+private ArrayList seriesList = new ArrayList<>();
+
+public void addSeries(Series s) {
+seriesList.add(s);
+}
+
+public Series searchSeries(int id) {
+for (Series s : seriesList) {
+if (s.getId() == id) {
+return s;
+}
+}
+return null;
+}
+
+public boolean updateSeries(int id, String newTitle, int newAge) {
+Series s = searchSeries(id);
+if (s != null) {
+s.setTitle(newTitle);
+s.setAgeRestriction(newAge);
+return true;
+}
+return false;
+}
+
+public boolean deleteSeries(int id) {
+Series s = searchSeries(id);
+if (s != null) {
+seriesList.remove(s);
+return true;
+}
+return false;
+}
+
+public boolean isValidAgeRestriction(int age) {
+return age >= 0 && age <= 21;
+}
+
+SeriesManagerTest.java
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class SeriesManagerTest {
+
+private SeriesManager manager;
+
+@BeforeEach
+void setUp() {
+manager = new SeriesManager();
+manager.addSeries(new Series(1, "Breaking Code", 16));
+manager.addSeries(new Series(2, "Java Nights", 13));
+}
+
+@Test
+void TestSearchSeries() {
+Series result = manager.searchSeries(1);
+assertNotNull(result);
+assertEquals("Breaking Code", result.getTitle());
+}
+
+@Test
+void TestSearchSeries_SeriesNotFound() {
+Series result = manager.searchSeries(99);
+assertNull(result);
+}
+
+@Test
+void TestUpdateSeries() {
+boolean updated = manager.updateSeries(1, "Breaking Code Updated", 18);
+assertTrue(updated);
+
+Series updatedSeries = manager.searchSeries(1);
+assertEquals("Breaking Code Updated", updatedSeries.getTitle());
+assertEquals(18, updatedSeries.getAgeRestriction());
+}
+
+@Test
+void TestDeleteSeries() {
+boolean deleted = manager.deleteSeries(2);
+assertTrue(deleted);
+assertNull(manager.searchSeries(2));
+}
+
+@Test
+void TestDeleteSeries_SeriesNotFound() {
+boolean deleted = manager.deleteSeries(50);
+assertFalse(deleted);
+}
+
+@Test
+void TestSeriesAgeRestriction_AgeValid() {
+boolean valid = manager.isValidAgeRestriction(16);
+assertTrue(valid);
+}
+
+@Test
+void TestSeriesAgeRestriction_SeriesAgeInvalid() {
+boolean valid = manager.isValidAgeRestriction(-5);
+assertFalse(valid);
+}
+}
+}
